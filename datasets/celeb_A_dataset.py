@@ -13,12 +13,16 @@ class celeb_a_dataset():
         self.name = 'celeb_A'
     def generator(self):
         for name in self.file_list:
-          img = cv2.imread('{}/{}'.format(self.file_path, name), 1)
-          if not img is None:
-            img = cv2.resize(img, (self.image_width, self.image_width), interpolation=cv2.INTER_AREA)
-            b, g, r = cv2.split(img)
-            img = cv2.merge([r, g, b])
-            yield img
+            img = cv2.imread('{}/{}'.format(self.file_path, name), 1)
+            if not img is None:
+                image_width = min(img.shape[0], img.shape[1])
+                row = (img.shape[0] - image_width) // 2
+                col = (img.shape[1] - image_width) // 2
+                img = img[(row):(image_width + row - 1), (col):(image_width + col - 1)]
+                img = cv2.resize(img, (self.image_width, self.image_width), interpolation=cv2.INTER_AREA)
+                b, g, r = cv2.split(img)
+                img = cv2.merge([r, g, b])
+                yield img
     def parse(self, x):
         x = tf.cast(x, tf.float32)
         x = x/255 * 2 - 1
